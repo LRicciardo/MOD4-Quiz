@@ -1,24 +1,4 @@
 /*
-eventlistener click 
-start timer (count down)
-
->>>>>>
-display a question
-    with 4 answer buttons
-      until all questions are answered
-        or timer reaches 0
-eventListner keydown
-  if correct button is pushed add 1 to correct counter
-  else wrong button is pushed add 1 to wrong counter 
-        and subtract 1 min from timer
-    
-  <<<<<< 
-  end of quiz
-  display score (right and wrong and time)
-
-  store in an array string 
-        initials and score (correct and wrong and time)
-
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   notes: Movie titles should be italicized. not on the impotant side.
@@ -67,7 +47,7 @@ correct: "c",
 choices: { 
   a: "Nagasaki Tower",
   b: "Continental Building", 
-  c: "Nakatomi Plaza",
+  c: "Nagahama Plaza",
   d: "Aon Center", 
 },
 correct: "c",
@@ -195,10 +175,14 @@ var startButtonEl = document.getElementById('startBtn');
 var timerEl = document.getElementById('finalCountdown');
 
 var questionAreaEl = document.getElementById('questionArea');
-var ans1El = document.getElementById('ans1').value;
-var ans2El = document.getElementById('ans2').value;
-var ans3El = document.getElementById('ans3').value;
-var ans4El = document.getElementById('ans4').value;
+var guess1El = document.getElementById('guess1');
+var guess2El = document.getElementById('guess2');
+var guess3El = document.getElementById('guess3');
+var guess4El = document.getElementById('guess4');
+var choice1El = document.getElementById('choice1');
+var choice2El = document.getElementById('choice2');
+var choice3El = document.getElementById('choice3');
+var choice4El = document.getElementById('choice4');
 
 var listHOFEl = document.getElementById('listHOF');
 
@@ -209,11 +193,12 @@ var timeInterval = 0;
 
 var storedHOF = JSON.parse(localStorage.getItem("HallOfFame")) || [];
 
-var HallOfFame= [{player: "AAA",
-rightAns: 0,
-wrongAns: 0,
-minsLeft: 0,
-secsLeft: 0
+var hallOfFame= [{
+  player: "AAA",
+  rightAns: 0,
+  wrongAns: 0,
+  minsLeft: 0,
+  secsLeft: 0
 }];
 
 var playerRecord = [{
@@ -236,7 +221,28 @@ function programInit() {
   //  display stored Hall of Fame
   retrieveHallOfFame();
   console.log('questionsList>> ' + questionsList);
+  // Testing access to quiz questions
+  console.log("random question list Idx=>> " + questionsIdx);
+  console.log("random question list quiz idx # =>> " + questionsList[questionsIdx]);
+  console.log("quiz length ==>" + quiz.length);
+  var testIdx = questionsList[questionsIdx];
+  console.log("quiz question ==>" + quiz[testIdx].question);
+  console.log("quiz choice 1 ==>" + quiz[testIdx].choices.a);
+  prompt("What are your initials?", playerRecord[0].player);
+  playerRecord[0].rightAns = 0;
+  playerRecord[0].wrongAns = 0;
+  playerRecord[0].minsLeft = 0;
+  playerRecord[0].secsLeft = 0;
+};
+function programClose() {
+  console.log(">>> Entered programClose function <<<<");
+  // update Hall Of Fame
   storeScore();
+  questionAreaEl.innerHTML = "      Great Job! ";
+  choice1El.innerHTML= "         Quiz is done!";
+  choice2El.innerHTML= " I hope you had a good time.";
+  choice3El.innerHTML= " ";
+  choice4El.innerHTML= " ";
 };
 
 // retrieve Hall of Fame names from stroage 
@@ -257,24 +263,30 @@ function retrieveHallOfFame() {
 function renderHOF() {
   console.log(">>> Entered renderHOF function <<<<");
   listHOFEl.innerHTML = "";
-  
+  var textHOF = "";
+  console.log(">>> Hall Of Fame Length ==>" + HallOfFame.length);
   // storing last 5 players
   // for (var i in HallOfFame) {
-  if (HallOfFame.length === 0) {
-    var liEl = document.createElement("li");
-    liEl.textContent = " no players in Hall Of Fame";
-    console.log("li ===>> " + liEl.textContent);
-    listHOFEl.appendChild(liEl);
+    if (HallOfFame.length === 0) {
+      console.log(">>> inside if length 0 ==>");
+      var liEl = document.createElement("li");           // create "li" element
+      textHOF = "No players in Hall Of Fame";
+      liElText = document.createTextNode(textHOF);       // create "li" textNode 
+      liEl.appendChild(liElText);   // connect the text to the element
+      listHOFEl.appendChild(liEl);  // connect the element to the list
   }  else {
     for (var i = 0; i < HallOfFame.length; i++) {
-    var liEl = document.createElement("li");
-    liEl.textContent  = HallOfFame.player + '     ';
-    liEl.textContent += HallOfFame.rightAns + '     ' ; 
-    liEl.textContent += HallOfFame.wrongAns + '     ' ;
-    liEl.textContent += HallOfFame.minsLeft + ':';
-    liEl.textContent += HallOfFame.secsLeft;
-    console.log("li ===>> " + liEl.textContent);
-    listHOFEl.appendChild(liEl);
+      var liEl = document.createElement("li");          // create "li" element
+      textHOF  = HallOfFame.player   + '     ';
+      textHOF += HallOfFame.rightAns + '     ' ; 
+      textHOF += HallOfFame.wrongAns + '     ' ;
+      textHOF += HallOfFame.minsLeft + ':';
+      textHOF += HallOfFame.secsLeft;
+      textHOF += HallOfFame.secsLeft;
+      console.log("textHOF ===>> " + textHOF);
+      liElText = document.createTextNode(textHOF);       // create "li" textNode 
+      liEl.appendChild(liElText);   // connect the text to the element
+      listHOFEl.appendChild(liEl);  // connect the element to the list
   };
   };
 };
@@ -360,74 +372,87 @@ function stopInterval() {
 
 // stores last 5 players on Hall of Fame in local Storage
 function storeScore() {
-  console.log(">>> Entered storeHallOfFame function <<<");
-  console.log(">>> before playerRecord ==>" + playerRecord);
-  console.log(">>> before Hall Of Fame ==>" + HallOfFame);
-  console.log(">>> before storeHallOfFame ==>" + storedHOF);
-  if (HallOfFame.length < 5) {
-    HallOfFame.concat(playerRecord.values);
+  console.log(">>> Entered storeScore function <<<");
+
+  if (hallOfFame.length < 5) {
+    hallOfFame.concat(playerRecord);
   } else {
-    HallOfFame.shift();
-    HallOfFame.concat(playerRecord.values);
+    hallOfFame.shift();
+    hallOfFame.concat(playerRecord);
   };
-  storedHOF = localStorage.setItem("HallOfFame", JSON.stringify(HallOfFame));
-  console.table(">>> after playerRecord ==>" + playerRecord);
-  console.table(">>> after Hall Of Fame ==>" + HallOfFame);
-  console.log(">>> after storeHallOfFame ==>" + storedHOF);
+  localStorage.setItem("HallOfFame", JSON.stringify(hallOfFame));
 };
 
 function askQuestions() {
   console.log(">>> Entered renderQuestion function <<<<");
-  console.log (">> questions List length ==>"+ questionsList.length);
   
   // questionsIdx = inputIdx; 
   console.log("question Idx=>> " + questionsIdx);
   console.log("questionList entry>> " + questionsList[questionsIdx]);
-  questionAreaEl.innerHTML = (quiz.question[questionsList(questionsIdx)])
+  // questionAreaEl.innerHTML = (quiz.question[questionsList(questionsIdx)])
+  questionAreaEl.innerHTML = "quiz.question.randomidx";
+  choice1El.innerHTML= "quiz.choice 1";
+  choice2El.innerHTML= "quiz.choice 2";
+  choice3El.innerHTML= "quiz.choice 3";
+  choice4El.innerHTML= "quiz.choice 4";
   
   for (var i = 0; i < questionsList.length; i++) {
-    questionAreaEl.innerHTML= quiz[questionsList[i]].question.text;
-    ans1El.innerHTML= quiz[questionsList[i]].choices[0].text;
-    ans2El.innerHTML= quiz[questionsList[i]].choices[1].text;
-    ans3El.innerHTML= quiz[questionsList[i]].choices[2].text;
-    ans4El.innerHTML= quiz[questionsList[i]].choices[3].text;
-    correctAns = quiz[questionsList[i]].correct;
-    ans1El.addEventListener("click", guessAnswerA);
-    ans2El.addEventListener("click", guessAnswerB);
-    ans3El.addEventListener("click", guessAnswerC);
-    ans4El.addEventListener("click", guessAnswerD);
+    var quizIdx = questionsList[i]
+    questionAreaEl.innerHTML= quiz[quizIdx].question;
+    choice1El.innerHTML= quiz[quizIdx].choices.a;
+    choice2El.innerHTML= quiz[quizIdx].choices.b;
+    choice3El.innerHTML= quiz[quizIdx].choices.c;
+    choice4El.innerHTML= quiz[quizIdx].choices.d;
     
-    }
+    correctAns = quiz[quizIdx].correct;
+    console.log (">> correctAns ==>" + correctAns);
+    choice1El.addEventListener("click", guessAnswerA);
+    choice2El.addEventListener("click", guessAnswerB);
+    choice3El.addEventListener("click", guessAnswerC);
+    choice4El.addEventListener("click", guessAnswerD);
+  }
   // storing last 5 players
-  ans1El.textContent = quiz.choices.a[questionsList(questionsIdx)]; 
+  // choice1El.textContent = quiz.choices.a[questionsList(questionsIdx)]; 
 };
 
-function guessAnswerA() {
-  if (ans1El.dataset['data-letter'] == correctAns) {
+function guessAnswerA(event) {
+  console.log(">>> Entered guessAnswerA function <<<<");
+  event.preventDefault();
+
+  if (choice1El.dataset['data-choice'] == correctAns) {
     playerRecord.rightAns++;
   } else {
     playerRecord.wrongAns++;
     subtractTime(0,30);
   }
 };
-function guessAnswerB() {
-  if (ans2El.dataset['data-letter'] == correctAns) {
+function guessAnswerB(event) {
+  console.log(">>> Entered guessAnswerB function <<<<");
+  event.preventDefault();
+
+  if (choice2El.dataset['data-choice'] == correctAns) {
     playerRecord.rightAns++;
   } else {
     playerRecord.wrongAns++;
     subtractTime(0,30);
   }
 };
-function guessAnswerC() {
-  if (ans3El.dataset['data-letter'] == correctAns) {
+function guessAnswerC(event) {
+  console.log(">>> Entered guessAnswerC function <<<<");
+  event.preventDefault();
+
+  if (choice3El.dataset['data-choice'] == correctAns) {
     playerRecord.rightAns++;
   } else {
     playerRecord.wrongAns++;
     subtractTime(0,30);
   }
 };
-function guessAnswerD() {
-  if (ans4El.dataset['data-letter'] == correctAns) {
+function guessAnswerD(event) {
+  console.log(">>> Entered guessAnswerD function <<<<");
+  event.preventDefault();
+
+  if (choice4El.dataset['data-choice'] == correctAns) {
     playerRecord.rightAns++;
   } else {
     playerRecord.wrongAns++;
@@ -435,29 +460,18 @@ function guessAnswerD() {
   }
 };
 
-function programFlow() {
+function programFlow(event) {
   console.log(">>> Entered programFlow function <<<<");
   event.preventDefault();
-  
-  prompt("What are your initials?", playerRecord.player);
+    prompt("What are your initials?", playerRecord.player);
   // start countdown for 5 min
   countdown(5,0);
   askQuestions();
-  
-  // if (timeSecsLeft > 0 || timeMinsLeft > 0) {
-    // playerRecord.minsLeft = timeMinsLeft;
-    // playerRecord.secsLeft = timeSecsLeft;
-    // timeMinsLeft = 0;
-    // timeSecsLeft = 0;
-    // console.log("All questions answered");
-    // console.log(" reset time interval");
-    // stopInterval();
-  // };
-  storeScore();
-  console.log(">>>>>>>>>>>>>>>>>>>  End of JavaScript  <<<<<<<<<<<<<<<<")
 };
 
 // Populate Hall of Fame, init countdown and 
- programInit();
- // Attach event listener to start button element
- startButtonEl.addEventListener("click", programFlow);
+programInit();
+// Attach event listener to start button element
+startButtonEl.addEventListener("click", programFlow);
+programClose();
+console.log(">>>>>>>>>>>>>>>>>>>  End of JavaScript  <<<<<<<<<<<<<<<<")

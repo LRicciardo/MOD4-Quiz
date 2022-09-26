@@ -58,6 +58,7 @@ h3 {
 .answerArea {
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
   padding: 1rem;
   background-color: white;
 }
@@ -78,9 +79,11 @@ li {
   margin-bottom: .5rem;
   padding: 1rem;
   /* background-color:  #001b44; */
-  color: white;
+  color: black;
   font-size: 1.5rem;
   line-height: 1.5;
+  list-style-type: none;
+  
 }
 
 li:before {
@@ -113,7 +116,7 @@ li button {
     rgba(60, 64, 67, 0.15) 0 2px 4px 3px;
   margin: 60px auto;
   padding: 20px;
-  width: 80%;
+  width: 75%;
 }
 
 .holdingContainer {
@@ -125,5 +128,5 @@ li button {
     rgba(60, 64, 67, 0.15) 0 2px 4px 3px;
   margin: 60px auto;
   padding: 20px;
-  width: 20%;
+  width: 25%;
 }
