@@ -1,6 +1,7 @@
 :root {
   --color-bg: lightblue;
 }
+
 html {
   font-size: 62.5%;
 }
@@ -17,29 +18,58 @@ body {
   position: relative;
   justify-content: space-around;
 }
+.main {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  justify-content: space-around;
+}
 
-h1 {
+header h1 {
   font-size: 5rem;
   text-align: center;
 }
-.countdown {
-  font-size: 3rem;
+
+header h3 {
+  font-size: 2rem;
+  text-align: center;
 }
-#count {
-  justify-content: center;
+#startBtn {
+  height: 5rem;
+  background-color: red;
+  color: white;
+  font-weight: bold;
 }
+
+#finalCountdown {
+  font-size: 5rem;
+  margin-top: -2rem;;
+}
+
 h3 {
   font-size: 2rem;
+  text-align: center;
 }
 
-.questionArea {
- font-size: 2.5rem;
+.question-container {
+ font-size: 3rem;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+.answerArea {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
   background-color: white;
+}
+.answerArea button {
+  margin: 1rem;
+  font-size: 2rem;
+  text-align: left;
+}
+.answerArea button:hover {
+  cursor: pointer;
+  background-color: #001b44;
+  color: #D0FAFA;
 }
 
 li {
@@ -74,7 +104,7 @@ li button {
   font-size: 2rem;
 }
 
-.container {
+.quiz-container {
   display: block;
   background-color:	#FFFFE0;
   border: 1px solid #eceff1;
@@ -83,7 +113,7 @@ li button {
     rgba(60, 64, 67, 0.15) 0 2px 4px 3px;
   margin: 60px auto;
   padding: 20px;
-  width: 80vw;
+  width: 80%;
 }
 
 .holdingContainer {
@@ -95,5 +125,5 @@ li button {
     rgba(60, 64, 67, 0.15) 0 2px 4px 3px;
   margin: 60px auto;
   padding: 20px;
-  width: 80vw;
+  width: 20%;
 }

@@ -16,7 +16,7 @@ eventListner keydown
   end of quiz
   display score (right and wrong and time)
 
-  store in an arrary string 
+  store in an array string 
         initials and score (correct and wrong and time)
 
 
@@ -190,27 +190,96 @@ choices: {
 correct: "d",
 },
 ];
-
+//DOM Elements
 var startButtonEl = document.getElementById('startBtn');
 var timerEl = document.getElementById('finalCountdown');
-var listHOF = document.querySelector('listHOF');
-var timeMinLeft = 5;
-var timeSecLeft = 0;
 
+var questionAreaEl = document.getElementById('questionArea');
+var ans1El = document.getElementById('ans1').value;
+var ans2El = document.getElementById('ans2').value;
+var ans3El = document.getElementById('ans3').value;
+var ans4El = document.getElementById('ans4').value;
 
-var storageHallOfFame = {};
-var playerRecord = {
+var listHOFEl = document.getElementById('listHOF');
+
+//Global variables
+var timeMinsLeft = 5;
+var timeSecsLeft = 0;
+var timeInterval = 0;
+
+var storedHOF = JSON.parse(localStorage.getItem("HallOfFame")) || [];
+
+var HallOfFame= [{player: "AAA",
+rightAns: 0,
+wrongAns: 0,
+minsLeft: 0,
+secsLeft: 0
+}];
+
+var playerRecord = [{
   player: "xxx", 
-  rightAns: 0, 
-  wrongAns: 0, 
-  recordMinsLeft: 0,
-  recordSecsLeft:0 , 
-};
+  rightAns: 9, 
+  wrongAns: 9, 
+  MinsLeft: 99,
+  secsLeft: 99 
+}];
+
 // This variable will hold the randomized list of Indexes for the quiz questions
-var questionsList = [];
-var questionsCtr = 0;
+var questionsList = randomQuestions();
+var questionsIdx = 0;
 
 
+function programInit() {
+  console.log(">>> Entered programInit function <<<<")
+  //  display timer
+  timerEl.textContent = "05:00";
+  //  display stored Hall of Fame
+  retrieveHallOfFame();
+  console.log('questionsList>> ' + questionsList);
+  storeScore();
+};
+
+// retrieve Hall of Fame names from stroage 
+function retrieveHallOfFame() {
+  console.log(">>> Entered retrieveHallOfFame function <<<<");
+  
+  // If stored data is null save an empty array
+  if (storedHOF == null) {
+    console.log("Storage is null --save an empty array");
+    localStorage.setItem("HallOfFame","[]");
+    storedHOF = [];
+  }
+  console.log("LocalStorage Hall Of Fame==>>", storedHOF);
+  HallOfFame = storedHOF;
+  renderHOF();
+};
+
+function renderHOF() {
+  console.log(">>> Entered renderHOF function <<<<");
+  listHOFEl.innerHTML = "";
+  
+  // storing last 5 players
+  // for (var i in HallOfFame) {
+  if (HallOfFame.length === 0) {
+    var liEl = document.createElement("li");
+    liEl.textContent = " no players in Hall Of Fame";
+    console.log("li ===>> " + liEl.textContent);
+    listHOFEl.appendChild(liEl);
+  }  else {
+    for (var i = 0; i < HallOfFame.length; i++) {
+    var liEl = document.createElement("li");
+    liEl.textContent  = HallOfFame.player + '     ';
+    liEl.textContent += HallOfFame.rightAns + '     ' ; 
+    liEl.textContent += HallOfFame.wrongAns + '     ' ;
+    liEl.textContent += HallOfFame.minsLeft + ':';
+    liEl.textContent += HallOfFame.secsLeft;
+    console.log("li ===>> " + liEl.textContent);
+    listHOFEl.appendChild(liEl);
+  };
+  };
+};
+
+// Gets a random list of 10 questions making sure none duplicate
 function randomQuestions() {
   console.log(">>> Entered randomQuestions <<<<")
   var randomList = [];
@@ -224,116 +293,146 @@ function randomQuestions() {
   } while (randomList.length < 10) ;
   return  randomList; 
 };
-
-function programInit() {
-  console.log(">>> Entered programInit function <<<<")
-  //  display timer
-  timerEl.textContent = "05:00";
-  //  display stored Hall of Fame
-  retrieveHallOfFame();
-  // create 10 random questions
-  questionsList = randomQuestions();
-  console.log('questionsList>> ' + questionsList);
-}
-
-
-// retrieve Hall of Fame names from stroage 
-function retrieveHallOfFame() {
-  console.log(">>> Entered retrieveHallOfFame function <<<<");
-  storageHallOfFame = JSON.parse(localStorage.getItem("HallOfFame"));
-  console.log("String saved in LocalStorage==>>", storageHallOfFame);
-  
-  
-  // Check if data is returned, if not exit out of the function
-  if (storageHallOfFame !== null) {
-    console.log("Storage is not null --populate==>>");
-    // renderHOF();
-    // document.getElementById("saved-name").innerHTML = lastGrade.student;
-    // document.getElementById("saved-grade").innerHTML = lastGrade.grade;
-    // document.getElementById("saved-comment").innerHTML = lastGrade.comment;
-  } else {
-    return;
-  };
-};
-function renderHOF() {
-  listHOF.innerHTML = "";
-  todoCountSpan.textContent = todos.length;
-  
-  // TODO: Describe the functionality of the following `for` loop.
-  for (var i = 0; i < listHOF.length; i++) {
-    var playerHOF = player[i];
     
-    var li = document.createElement("li");
-    li.textContent = todo;
-    li.setAttribute("data-index", i);
-    
-    li.appendChild(button);
-    todoList.appendChild(li);
-  };
-};
-
 //  Subtract time from timer using Global vars
 function subtractTime (minutes,seconds) {
-  if (timeSecLeft > seconds) {
-    timeSecLeft -= seconds;
-  } else if (timeMinLeft > 0) {
-    timeMinLeft--;
-    timeSecLeft -= seconds + 60;
+  if (timeSecsLeft > seconds) {
+    timeSecsLeft -= seconds;
+  } else if (timeMinsLeft > 0) {
+    timeMinsLeft--;
+    timeSecsLeft -= seconds + 60;
   } else {
-    timeSecLeft = 0;
-    timeMinLeft = 0;
+    timeSecsLeft = 0;
+    timeMinsLeft = 0;
     return;
   };
-  if (timeMinLeft >= minutes) {
-    timeMinLeft -= minutes;
+  if (timeMinsLeft >= minutes) {
+    timeMinsLeft -= minutes;
   } else {
-    timeSecLeft = 0;
-    timeMinLeft = 0;
+    timeSecsLeft = 0;
+    timeMinsLeft = 0;
   };
 };
 
 // Timer that counts down from 5 min 0 sec
 function countdown(minutes,seconds) {
   console.log(">>> Entered countdown function <<<<")
-  timeMinLeft = minutes;
-  timeSecLeft = seconds;
+  timeMinsLeft = minutes;
+  timeSecsLeft = seconds;
+
   // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
-  var timeInterval = setInterval(function () {
+  timeInterval = setInterval(function () {
     // As long as the `timeLeft` is greater than 1
-    if (timeSecLeft > 0) {
+    if (timeSecsLeft > 0) {
       // Set the `textContent` of `timerEl` to show the remaining seconds
-      timerEl.textContent = timeMinLeft + ':' + timeSecLeft;
+      timerEl.textContent = timeMinsLeft + ':' + timeSecsLeft;
       // Decrement `timeLeft` by 1
-      timeSecLeft--;
-    } else if (timeMinLeft > 0) {
+      timeSecsLeft--;
+    } else if (timeMinsLeft > 0) {
       // When `timeLeft` is equal to 1, rename to 'second' instead of 'seconds'
-      timerEl.textContent = timeMinLeft + ':' + timeSecLeft;
-      timeMinLeft--;
-      timeSecLeft = 59;
+      timerEl.textContent = timeMinsLeft + ':' + timeSecsLeft;
+      timeMinsLeft--;
+      timeSecsLeft = 59;
     } else {
       // Once `timeLeft` gets to 0, set `timerEl` to an empty string
-      timerEl.textContent = '';
+      timerEl.textContent = '00:00';
       // Use `clearInterval()` to stop the timer
       clearInterval(timeInterval);
       // Call the `displayMessage()` function
-      displayMessage();
+      // displayMessage();
+      console.log(">>> Out of Time message here <<<" );
     }
   }, 1000);
-}
+};
 
-function getAnswer() {
-  console.log(">>> Entered getAnswer function <<< counter=" + questionCtr);
-  questionsCtr++;
-  // renderQuestion();
+// Clear Timer 
+function stopInterval() {
+  console.log(">>> Entered clearInterval function <<<<")
+  // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
+  timeInterval = setInterval(function () {
+      // Use `clearInterval()` to stop the timer
+      clearInterval(timeInterval);
+      // Call the `displayMessage()` function
+      // displayMessage();
+      console.log(">>> Stopped timer message here <<<" );
+  }, 1000);
+};
 
-  //  onkeydown event
+// stores last 5 players on Hall of Fame in local Storage
+function storeScore() {
+  console.log(">>> Entered storeHallOfFame function <<<");
+  console.log(">>> before playerRecord ==>" + playerRecord);
+  console.log(">>> before Hall Of Fame ==>" + HallOfFame);
+  console.log(">>> before storeHallOfFame ==>" + storedHOF);
+  if (HallOfFame.length < 5) {
+    HallOfFame.concat(playerRecord.values);
+  } else {
+    HallOfFame.shift();
+    HallOfFame.concat(playerRecord.values);
+  };
+  storedHOF = localStorage.setItem("HallOfFame", JSON.stringify(HallOfFame));
+  console.table(">>> after playerRecord ==>" + playerRecord);
+  console.table(">>> after Hall Of Fame ==>" + HallOfFame);
+  console.log(">>> after storeHallOfFame ==>" + storedHOF);
+};
 
-  //  if target is correct
-  //    add 1 to the rightAns++
-  //  else
-  //    add 1 to the wrong counter
-  //    display wrong ans
-  //    subtractTime(0,30)
+function askQuestions() {
+  console.log(">>> Entered renderQuestion function <<<<");
+  console.log (">> questions List length ==>"+ questionsList.length);
+  
+  // questionsIdx = inputIdx; 
+  console.log("question Idx=>> " + questionsIdx);
+  console.log("questionList entry>> " + questionsList[questionsIdx]);
+  questionAreaEl.innerHTML = (quiz.question[questionsList(questionsIdx)])
+  
+  for (var i = 0; i < questionsList.length; i++) {
+    questionAreaEl.innerHTML= quiz[questionsList[i]].question.text;
+    ans1El.innerHTML= quiz[questionsList[i]].choices[0].text;
+    ans2El.innerHTML= quiz[questionsList[i]].choices[1].text;
+    ans3El.innerHTML= quiz[questionsList[i]].choices[2].text;
+    ans4El.innerHTML= quiz[questionsList[i]].choices[3].text;
+    correctAns = quiz[questionsList[i]].correct;
+    ans1El.addEventListener("click", guessAnswerA);
+    ans2El.addEventListener("click", guessAnswerB);
+    ans3El.addEventListener("click", guessAnswerC);
+    ans4El.addEventListener("click", guessAnswerD);
+    
+    }
+  // storing last 5 players
+  ans1El.textContent = quiz.choices.a[questionsList(questionsIdx)]; 
+};
+
+function guessAnswerA() {
+  if (ans1El.dataset['data-letter'] == correctAns) {
+    playerRecord.rightAns++;
+  } else {
+    playerRecord.wrongAns++;
+    subtractTime(0,30);
+  }
+};
+function guessAnswerB() {
+  if (ans2El.dataset['data-letter'] == correctAns) {
+    playerRecord.rightAns++;
+  } else {
+    playerRecord.wrongAns++;
+    subtractTime(0,30);
+  }
+};
+function guessAnswerC() {
+  if (ans3El.dataset['data-letter'] == correctAns) {
+    playerRecord.rightAns++;
+  } else {
+    playerRecord.wrongAns++;
+    subtractTime(0,30);
+  }
+};
+function guessAnswerD() {
+  if (ans4El.dataset['data-letter'] == correctAns) {
+    playerRecord.rightAns++;
+  } else {
+    playerRecord.wrongAns++;
+    subtractTime(0,30);
+  }
 };
 
 function programFlow() {
@@ -343,22 +442,19 @@ function programFlow() {
   prompt("What are your initials?", playerRecord.player);
   // start countdown for 5 min
   countdown(5,0);
-  questionsList.foreach(getAnswer);
-  //  retrieve first question and answerChoices (need a flag for which is correct)
-  //  display question/answer
-  //onkeydown event
-  //  if answer is correct
-  //    add 1 to the correct counter 
-  //    got to next question
-//  else
-//    add 1 to the wrong counter
-//    display wrong ans
-//    subtract 30 seconds from timer subtractTime(0,30)
-console.log (">> quiz length ==>"+ quiz.length);
-
-//  if player completed question in time store in hall of fame
-localStorage.setItem("HallOfFame", JSON.stringify(playerRecord));
-console.log("Just setItem HallOfFame");
+  askQuestions();
+  
+  // if (timeSecsLeft > 0 || timeMinsLeft > 0) {
+    // playerRecord.minsLeft = timeMinsLeft;
+    // playerRecord.secsLeft = timeSecsLeft;
+    // timeMinsLeft = 0;
+    // timeSecsLeft = 0;
+    // console.log("All questions answered");
+    // console.log(" reset time interval");
+    // stopInterval();
+  // };
+  storeScore();
+  console.log(">>>>>>>>>>>>>>>>>>>  End of JavaScript  <<<<<<<<<<<<<<<<")
 };
 
 // Populate Hall of Fame, init countdown and 

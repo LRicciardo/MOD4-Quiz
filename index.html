@@ -11,6 +11,7 @@
   <body>
     <header>
       <h1>Movie Trivia for Dinosaurs</h1>
+      <h3>or for Serious Movie Buffs</h3>
     </header>
     <div class="heading1-container">
       <button id="startBtn" type="button" >START</button>
@@ -18,23 +19,26 @@
         <h3 id="time-hdg">Time<br>Remaining</h3>
         <p id="finalCountdown">00:00</p>
       </div>
-      
     </div>
-    <div class="container">
-      <span class="questionArea">This is the question</span>
-      <ul class="answerArea">
-        <li><button type="button" id="ans1">This is answer choice 1</button></li>
-        <li><button type="button" id="ans2">This is answer choice 2</button></li>
-        <li><button type="button" id="ans3">This is answer choice 3</button></li>
-        <li><button type="button" id="ans4">This is answer choice 4</button></li>
-      </ul>
-    </div>
-    <aside class="holdingContainer">
-      <div class="famousPeople">
-        <h3 class="hallOfFame">Hall of Fame</h3>
-        <ul class="listHOF">xxxxxxxxxx</ul>
+    <div class="main">
+      <div class="quiz-container">
+        <div class="question-container">
+          <span id ="questionArea">This is the question</span>
+        </div>
+        <div class="answerArea">
+          <button type="button" id="ans1" data-letter="a">A. <span id="choice1"></span></button>
+          <button type="button" id="ans2" data-letter="b">B. <span id="choice2"></span></button>
+          <button type="button" id="ans3" data-letter="c">C. <span id="choice3"></span></button>
+          <button type="button" id="ans4" data-letter="d">D. <span id="choice4"></span></button>
+        </div>
       </div>
-    </aside>
+      <div class="holdingContainer">
+        <div class="famousPeople">
+          <h3 class="hallOfFame">Hall of Fame</h3>
+          <ul id="listHOF">xxxxxxxxxx</ul>
+        </div>
+      </div>
+    </div>
     <script src="./assets/js/script.js"></script>
   </body>
 </html>
