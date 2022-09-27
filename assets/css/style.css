@@ -17,6 +17,8 @@ body {
   flex-direction: row;
   position: relative;
   justify-content: space-around;
+  align-items:center;
+  height: 10rem;
 }
 .main {
   display: flex;
@@ -30,12 +32,18 @@ header h1 {
   text-align: center;
 }
 
-header h3 {
-  font-size: 2rem;
+header h2 {
+  font-size: 3rem;
   text-align: center;
 }
+
+.countdown h3 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: -5.0rem;
+}
 #startBtn {
-  height: 5rem;
+  height: 5.5rem;
   background-color: red;
   color: white;
   font-weight: bold;
@@ -43,12 +51,17 @@ header h3 {
 
 #finalCountdown {
   font-size: 5rem;
-  margin-top: -2rem;;
 }
 
-h3 {
-  font-size: 2rem;
+.hallOfFame h3 {
+  font-size: 1.5rem;
   text-align: center;
+}
+.hallOfFame h6 {
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+  margin: 0;
 }
 
 .question-container {
@@ -68,16 +81,16 @@ h3 {
   text-align: left;
 }
 .answerArea button:hover {
-  cursor: pointer;
+  cursor: grabbing;
   background-color: #001b44;
   color: #D0FAFA;
 }
 
 li {
   height: 2rem;
-  margin-top: .5rem;
-  margin-bottom: .5rem;
-  padding: 1rem;
+  margin-top: .25rem;
+  margin-bottom: .25rem;
+  padding: .25rem;
   /* background-color:  #001b44; */
   color: black;
   font-size: 1.5rem;
@@ -86,36 +99,36 @@ li {
   
 }
 
-li:before {
+/* li:before {
   content: "\200B";
   position: absolute;
-}
+} */
 
-li::after {
+/* li::after {
   content: " ";
   display: block;
   clear: both;
-}
-
-li button {
+} */
+/* need to remove  -- Do not have list item button */
+/* li button { */
   /* float: right; */
-  border: none;
-  height: 40px;
-  cursor: pointer;
-  background-color: #ff7034;
-  color: white;
-  font-size: 2rem;
-}
+  /* border: none; */
+  /* height: 40px; */
+  /* cursor: pointer; */
+  /* background-color: #ff7034; */
+  /* color: white; */
+  /* font-size: 2rem; */
+/* } */
 
 .quiz-container {
   display: block;
   background-color:	#FFFFE0;
   border: 1px solid #eceff1;
-  border-radius: 8px;
+  border-radius: 1.0rem;
   box-shadow: rgba(60, 64, 67, 2) 0 1px 2px 0,
     rgba(60, 64, 67, 0.15) 0 2px 4px 3px;
-  margin: 60px auto;
-  padding: 20px;
+  margin: 0.5rem auto;
+  padding: 1.5rem;
   width: 75%;
 }
 
@@ -123,10 +136,10 @@ li button {
   display: block;
   background-color:	#FFFFE0;
   border: 1px solid #eceff1;
-  border-radius: 8px;
+  border-radius: 1.0rem;
   box-shadow: rgba(60, 64, 67, 2) 0 1px 2px 0,
     rgba(60, 64, 67, 0.15) 0 2px 4px 3px;
-  margin: 60px auto;
-  padding: 20px;
+  margin: 0.5rem auto;
+  padding: .25rem;
   width: 25%;
 }

@@ -1,5 +1,13 @@
 /*
 
+Old Time Movies Trivia 
+How much do you know? 
+This script retieves 10 random trivia questions from the quiz database. 
+This goal is to get as many rihgt answers in the set amount of time.
+If you have the most correct answers with the most time left, you are aces.
+
+Click on the start button, enter your initials, and your off!
+
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   notes: Movie titles should be italicized. not on the impotant side.
 
@@ -63,7 +71,7 @@ correct: "a",
 },
 {question: "What shocking Wes Craven horror movie carried the marketing tagline, \"To avoid fainting, keep repeating, \'It's only a movie...\'\"?",
 choices: { 
-  a: "Nightmare on ELm Street", 
+  a: "Nightmare on Elm Street", 
   b:"The Last House on the Left",
   c: "Scream", 
   d: "My Soul to Take",
@@ -170,126 +178,67 @@ choices: {
 correct: "d",
 },
 ];
-//DOM Elements
-var startButtonEl = document.getElementById('startBtn');
-var timerEl = document.getElementById('finalCountdown');
+//>>>>>>>>>>>>>>>>>>>    DOM Elements   <<<<<<<<<<<<<<
 
-var questionAreaEl = document.getElementById('questionArea');
-var guess1El = document.getElementById('guess1');
-var guess2El = document.getElementById('guess2');
-var guess3El = document.getElementById('guess3');
-var guess4El = document.getElementById('guess4');
-var choice1El = document.getElementById('choice1');
-var choice2El = document.getElementById('choice2');
-var choice3El = document.getElementById('choice3');
-var choice4El = document.getElementById('choice4');
+//>>>>>>>>>>>>>>>>>>>   Event Keys Elements   <<<<<<<<<<<<<<
+var startButtonEl = document.getElementById('startBtn');          // Start Button
+var guess1El = document.getElementById('guess1');                 // Guess A Button
+var guess2El = document.getElementById('guess2');                 // Guess B Button
+var guess3El = document.getElementById('guess3');                 // Guess C Button
+var guess4El = document.getElementById('guess4');                 // Guess D Button  
 
-var listHOFEl = document.getElementById('listHOF');
+//>>>>>>>>>>>>>>>>>>>   Display Change Elements   <<<<<<<<<<<<<<
+var questionAreaEl = document.getElementById('questionArea');     // Change Question
+var choice1El = document.getElementById('choice1');               // Change Choice A
+var choice2El = document.getElementById('choice2');               // Change Choice B
+var choice3El = document.getElementById('choice3');               // Change Choice C
+var choice4El = document.getElementById('choice4');               // Change Choice D
 
-//Global variables
-var timeMinsLeft = 5;
-var timeSecsLeft = 0;
-var timeInterval = 0;
+var timerEl = document.getElementById('finalCountdown');          // Change Timer
+var listHOFEl = document.getElementById('listHOF');               // Change Hall of Fame player list
 
+//>>>>>>>>>>>>>>>>>>>   Local Storage variables    <<<<<<<<<<<<<<
 var storedHOF = JSON.parse(localStorage.getItem("HallOfFame")) || [];
 
+//>>>>>>>>>>>>>>>>>>>   Global Variables    <<<<<<<<<<<<<<
+// ...........Quiz State Flag
+// ...........  Value  0 if Quiz not started
+// ...........  Value  1 if Quiz in process
+// ...........  Value -1 if Quiz over
+var quizWiz = 0;
+// ........... The current event 
+// ...........  Value  "start" if start button 
+// ...........  Value  "a" 1 if Answer A button
+// ...........  Value  "b" 1 if Answer B button
+// ...........  Value  "c" 1 if Answer C button
+// ...........  Value  "d" 1 if Answer D button
+var callButton = "none"
+
+// ............Timer Minutes and Seconds remaining
+var timeLeft = 0;
+
+// ............Tracks the number of questions asked 
+var quizCtr = 0;
+//  ...........randomized list of Indexes for the quiz questions
+var randomQuestion = [];
+//  ...........correct answer to the current question 
+var correctAns = "not set";
+
+// ...........do I need? Tracks the number of questions asked 
 var hallOfFame= [{
   player: "AAA",
   rightAns: 0,
   wrongAns: 0,
-  minsLeft: 0,
-  secsLeft: 0
+  timeLeft: "00:00",
 }];
 
+//  ...........current player information  
 var playerRecord = [{
   player: "xxx", 
   rightAns: 9, 
   wrongAns: 9, 
-  MinsLeft: 99,
-  secsLeft: 99 
+  timeLeft: "99:99",
 }];
-
-// This variable will hold the randomized list of Indexes for the quiz questions
-var questionsList = randomQuestions();
-var questionsIdx = 0;
-
-
-function programInit() {
-  console.log(">>> Entered programInit function <<<<")
-  //  display timer
-  timerEl.textContent = "05:00";
-  //  display stored Hall of Fame
-  retrieveHallOfFame();
-  console.log('questionsList>> ' + questionsList);
-  // Testing access to quiz questions
-  console.log("random question list Idx=>> " + questionsIdx);
-  console.log("random question list quiz idx # =>> " + questionsList[questionsIdx]);
-  console.log("quiz length ==>" + quiz.length);
-  var testIdx = questionsList[questionsIdx];
-  console.log("quiz question ==>" + quiz[testIdx].question);
-  console.log("quiz choice 1 ==>" + quiz[testIdx].choices.a);
-  prompt("What are your initials?", playerRecord[0].player);
-  playerRecord[0].rightAns = 0;
-  playerRecord[0].wrongAns = 0;
-  playerRecord[0].minsLeft = 0;
-  playerRecord[0].secsLeft = 0;
-};
-function programClose() {
-  console.log(">>> Entered programClose function <<<<");
-  // update Hall Of Fame
-  storeScore();
-  questionAreaEl.innerHTML = "      Great Job! ";
-  choice1El.innerHTML= "         Quiz is done!";
-  choice2El.innerHTML= " I hope you had a good time.";
-  choice3El.innerHTML= " ";
-  choice4El.innerHTML= " ";
-};
-
-// retrieve Hall of Fame names from stroage 
-function retrieveHallOfFame() {
-  console.log(">>> Entered retrieveHallOfFame function <<<<");
-  
-  // If stored data is null save an empty array
-  if (storedHOF == null) {
-    console.log("Storage is null --save an empty array");
-    localStorage.setItem("HallOfFame","[]");
-    storedHOF = [];
-  }
-  console.log("LocalStorage Hall Of Fame==>>", storedHOF);
-  HallOfFame = storedHOF;
-  renderHOF();
-};
-
-function renderHOF() {
-  console.log(">>> Entered renderHOF function <<<<");
-  listHOFEl.innerHTML = "";
-  var textHOF = "";
-  console.log(">>> Hall Of Fame Length ==>" + HallOfFame.length);
-  // storing last 5 players
-  // for (var i in HallOfFame) {
-    if (HallOfFame.length === 0) {
-      console.log(">>> inside if length 0 ==>");
-      var liEl = document.createElement("li");           // create "li" element
-      textHOF = "No players in Hall Of Fame";
-      liElText = document.createTextNode(textHOF);       // create "li" textNode 
-      liEl.appendChild(liElText);   // connect the text to the element
-      listHOFEl.appendChild(liEl);  // connect the element to the list
-  }  else {
-    for (var i = 0; i < HallOfFame.length; i++) {
-      var liEl = document.createElement("li");          // create "li" element
-      textHOF  = HallOfFame.player   + '     ';
-      textHOF += HallOfFame.rightAns + '     ' ; 
-      textHOF += HallOfFame.wrongAns + '     ' ;
-      textHOF += HallOfFame.minsLeft + ':';
-      textHOF += HallOfFame.secsLeft;
-      textHOF += HallOfFame.secsLeft;
-      console.log("textHOF ===>> " + textHOF);
-      liElText = document.createTextNode(textHOF);       // create "li" textNode 
-      liEl.appendChild(liElText);   // connect the text to the element
-      listHOFEl.appendChild(liEl);  // connect the element to the list
-  };
-  };
-};
 
 // Gets a random list of 10 questions making sure none duplicate
 function randomQuestions() {
@@ -305,173 +254,287 @@ function randomQuestions() {
   } while (randomList.length < 10) ;
   return  randomList; 
 };
-    
-//  Subtract time from timer using Global vars
-function subtractTime (minutes,seconds) {
-  if (timeSecsLeft > seconds) {
-    timeSecsLeft -= seconds;
-  } else if (timeMinsLeft > 0) {
-    timeMinsLeft--;
-    timeSecsLeft -= seconds + 60;
-  } else {
-    timeSecsLeft = 0;
-    timeMinsLeft = 0;
-    return;
-  };
-  if (timeMinsLeft >= minutes) {
-    timeMinsLeft -= minutes;
-  } else {
-    timeSecsLeft = 0;
-    timeMinsLeft = 0;
-  };
+
+// initialize the global variables for the quiz
+function initQuiz() {
+  console.log(">>> Entered initQuiz function <<<<")
+  //  display timer
+  timeLeft = ((5 * 60) + 0)
+  timerEl.textContent = "05:00";
+
+  // prompt player initials
+  prompt("What are your initials?", playerRecord[0].player);
+  playerRecord[0].rightAns = 0;
+  playerRecord[0].wrongAns = 0;
+  playerRecord[0].minsLeft = 0;
+  playerRecord[0].secsLeft = 0;
+  // get a different set of questions at the start of each quiz
+  randomQuestion = randomQuestions();
+  console.log("quiz length ==>" + quiz.length);
+  console.log('Random Idx List of to quiz questions>> ' + randomQuestion);
 };
 
-// Timer that counts down from 5 min 0 sec
-function countdown(minutes,seconds) {
-  console.log(">>> Entered countdown function <<<<")
-  timeMinsLeft = minutes;
-  timeSecsLeft = seconds;
-
-  // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
-  timeInterval = setInterval(function () {
-    // As long as the `timeLeft` is greater than 1
-    if (timeSecsLeft > 0) {
-      // Set the `textContent` of `timerEl` to show the remaining seconds
-      timerEl.textContent = timeMinsLeft + ':' + timeSecsLeft;
-      // Decrement `timeLeft` by 1
-      timeSecsLeft--;
-    } else if (timeMinsLeft > 0) {
-      // When `timeLeft` is equal to 1, rename to 'second' instead of 'seconds'
-      timerEl.textContent = timeMinsLeft + ':' + timeSecsLeft;
-      timeMinsLeft--;
-      timeSecsLeft = 59;
-    } else {
-      // Once `timeLeft` gets to 0, set `timerEl` to an empty string
-      timerEl.textContent = '00:00';
-      // Use `clearInterval()` to stop the timer
-      clearInterval(timeInterval);
-      // Call the `displayMessage()` function
-      // displayMessage();
-      console.log(">>> Out of Time message here <<<" );
-    }
-  }, 1000);
+// runs when quizWiz is -1 (end state)
+function endQuiz() {
+  console.log(">>> Entered endQuiz function <<<<");
+  // update Hall Of Fame
+  storeScore();
+  questionAreaEl.innerHTML = "      Great Job, " + playerRecord[0].player + "!";
+  choice1El.innerHTML= " You had " + playerRecord[0].rightAns + " right answers and " + playerRecord[0].wrongAns + " wrong.";
+  choice2El.innerHTML= "          You had " + playerRecord[0].timeLeft + " time remaining.";
+  choice3El.innerHTML= "                         Quiz is done!";
+  choice4El.innerHTML= "                  I hope you had a good time.";
 };
 
-// Clear Timer 
-function stopInterval() {
-  console.log(">>> Entered clearInterval function <<<<")
-  // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
-  timeInterval = setInterval(function () {
-      // Use `clearInterval()` to stop the timer
-      clearInterval(timeInterval);
-      // Call the `displayMessage()` function
-      // displayMessage();
-      console.log(">>> Stopped timer message here <<<" );
-  }, 1000);
-};
-
-// stores last 5 players on Hall of Fame in local Storage
 function storeScore() {
   console.log(">>> Entered storeScore function <<<");
-
+  console.log(" Hall of Fame  ==>" + hallOfFame);
+  console.log(" playerRecord ==>" + playerRecord[0].player + '/' + playerRecord[0].rightAns + '/' + playerRecord[0].wrongAns + '/' + playerRecord[0].minsLeft + ':' + playerRecord[0].secsLeft);
+  
   if (hallOfFame.length < 5) {
-    hallOfFame.concat(playerRecord);
+    hallOfFame.push(playerRecord[0]);
   } else {
     hallOfFame.shift();
-    hallOfFame.concat(playerRecord);
+    hallOfFame.push(playerRecord[0]);
   };
   localStorage.setItem("HallOfFame", JSON.stringify(hallOfFame));
 };
 
-function askQuestions() {
-  console.log(">>> Entered renderQuestion function <<<<");
+// remove Hall of Fame names from screen 
+function clearHallOfFame() {
+  console.log(">>> Entered clearHallOfFame function <<<<");
+
+  console.log(">>> Hall Of Fame element length ==>>", listHOFEl.length);
   
-  // questionsIdx = inputIdx; 
-  console.log("question Idx=>> " + questionsIdx);
-  console.log("questionList entry>> " + questionsList[questionsIdx]);
-  // questionAreaEl.innerHTML = (quiz.question[questionsList(questionsIdx)])
-  questionAreaEl.innerHTML = "quiz.question.randomidx";
-  choice1El.innerHTML= "quiz.choice 1";
-  choice2El.innerHTML= "quiz.choice 2";
-  choice3El.innerHTML= "quiz.choice 3";
-  choice4El.innerHTML= "quiz.choice 4";
-  
-  for (var i = 0; i < questionsList.length; i++) {
-    var quizIdx = questionsList[i]
-    questionAreaEl.innerHTML= quiz[quizIdx].question;
-    choice1El.innerHTML= quiz[quizIdx].choices.a;
-    choice2El.innerHTML= quiz[quizIdx].choices.b;
-    choice3El.innerHTML= quiz[quizIdx].choices.c;
-    choice4El.innerHTML= quiz[quizIdx].choices.d;
-    
-    correctAns = quiz[quizIdx].correct;
-    console.log (">> correctAns ==>" + correctAns);
-    choice1El.addEventListener("click", guessAnswerA);
-    choice2El.addEventListener("click", guessAnswerB);
-    choice3El.addEventListener("click", guessAnswerC);
-    choice4El.addEventListener("click", guessAnswerD);
-  }
-  // storing last 5 players
-  // choice1El.textContent = quiz.choices.a[questionsList(questionsIdx)]; 
 };
 
+// create and display Hall of Fame names from storage 
+function displayHallOfFame() {
+  console.log(">>> Entered displayHallOfFame function <<<<");
+  // retrieve local Storage every time we refresh the Hall of Fame
+  //   if the Hall of Fame not in storage, set to empty array
+  var hallOfFame = JSON.parse(localStorage.getItem("HallOfFame")) || [];
+  
+  // If stored data is null save an empty array
+  if (hallOfFame == null) {
+    console.log("Storage is null --save an empty array");
+    localStorage.setItem("HallOfFame","[]");
+    hallOfFame = [];
+  };
+
+  console.log(">>> Hall Of Fame==>>", hallOfFame);
+  
+  //  display Hall of Fame on the screen
+  listHOFEl.innerHTML = "";
+  var textHOF = "";
+
+  if (hallOfFame.length === 0) {
+    console.log("Hall of Fame array is empty");
+    var liEl = document.createElement("li");           // create "li" element
+    textHOF = "No famous people yet";
+    liEl.textContent = textHOF;
+    listHOFEl.appendChild(liEl);  // connect the list element to the "ul"
+  }  else {
+    for (var i = 0; i < hallOfFame.length; i++) {
+      var liEl = document.createElement("li");          // create "li" element
+      textHOF  = hallOfFame[i].player   + '-----' ;
+      textHOF += hallOfFame[i].rightAns + '-----' ; 
+      textHOF += hallOfFame[i].wrongAns + '-----' ;
+      textHOF += displayTime();
+      console.log("textHOF ===>> " + textHOF);
+      liEl.textContent = textHOF;
+      listHOFEl.appendChild(liEl);  // connect the list element to the "ul"
+    };
+  };
+};
+
+//  Subtract time from timer using Global vars
+function subtractTime (minutes,seconds) {
+  console.log(">>> Entered subtractTime function <<<<")
+  timeLeft -= ((minutes * 60) + seconds);
+};
+
+// Timer that counts down from 5 min 0 sec
+function runTimer() {
+  console.log(">>> Entered runTimer function <<<<")
+    // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
+  var timerInterval = setInterval(function () {
+    timeLeft--;
+    // As long as the `timeLeft` is greater than 1
+    if (timeLeft <= 0) {
+      // Once `timeLeft` gets to 0, set `timerEl` to an empty string
+      timerEl.textContent = '00:00';
+      // Use `clearInterval()` to stop the timer
+      clearInterval(timerInterval);
+      // Call the `displayMessage()` function
+      // displayMessage();
+      callButton = "timeOut";       // set the call status
+      quizWiz = -1;                 // set state to quiz over
+      console.log(">>> Out of Time message here <<<" );
+      stateOfTheUnion();
+    } else {
+     // Set the `textContent` of `timerEl` to show the remaining seconds
+      timerEl.textContent = displayTime();
+    };
+  }, 1000);
+};
+
+function displayTime () {
+  // console.log(">>> Entered displayTime function <<<<")
+  var displayTime  = "";
+  var timeMinsLeft = Math.floor(timeLeft / 60);
+  var timeSecsLeft = timeLeft % 60;
+  displayTime = "";
+  if (timeMinsLeft <= 9) {
+    displayTime += "0";
+  };
+  displayTime += timeMinsLeft;
+  displayTime +=  ":";
+  if (timeSecsLeft <= 9) {
+    displayTime += "0";
+  }; 
+  displayTime += timeSecsLeft;
+  return displayTime;
+};
+
+function AskQuestion () {
+  console.log(">>> Entered AskQuestion function <<<<");
+    // Testing access to quiz questions
+    
+  if (callButton == 'start') {
+    console.log(" Should be first Question ");
+  } else {
+    quizCtr++;
+  };
+    
+  console.log("quiz Counter=>> " + quizCtr);
+    
+  // run the loop to ask the questions
+  if (quizCtr < randomQuestion.length) {
+    console.log("current question Idx in quiz list =>> " + randomQuestion[quizCtr]);
+    var questionIdx = randomQuestion[quizCtr];
+    console.log("quiz Ctr=>> " + (quizCtr + 1) + " of " + randomQuestion.length);
+    //  populate Question and choices
+    questionAreaEl.innerHTML= quiz[questionIdx].question;
+    choice1El.innerHTML= quiz[questionIdx].choices.a;
+    choice2El.innerHTML= quiz[questionIdx].choices.b;
+    choice3El.innerHTML= quiz[questionIdx].choices.c;
+    choice4El.innerHTML= quiz[questionIdx].choices.d;
+    // hold the correct answer
+    correctAns = quiz[questionIdx].correct;
+    console.log (">> correctAns ==>" + correctAns);
+  } else {
+    quizWiz = -1;
+    stateOfTheUnion();
+  }
+};
+
+//  check the answer
+function checkAnswer() {
+  console.log(">>> Entered guessAnswerA function <<<<");
+  console.log(">>> call Button ==>>" + callButton);
+  console.log(">>> correct answer ==>>" + correctAns);
+  if (callButton == correctAns) {
+    console.log("..... Correct guess .....");
+    playerRecord[0].rightAns++;
+  } else {
+    console.log("..... Wrong guess .....");
+    playerRecord[0].wrongAns++;
+    subtractTime(0,30);
+  }
+};
+
+//  event onclick guess Button A
 function guessAnswerA(event) {
   console.log(">>> Entered guessAnswerA function <<<<");
-  event.preventDefault();
-
-  if (choice1El.dataset['data-choice'] == correctAns) {
-    playerRecord.rightAns++;
-  } else {
-    playerRecord.wrongAns++;
-    subtractTime(0,30);
-  }
+  // event.preventDefault();
+  callButton = "a";
+  stateOfTheUnion();
 };
+
+//  event onclick guess Button B
 function guessAnswerB(event) {
   console.log(">>> Entered guessAnswerB function <<<<");
-  event.preventDefault();
-
-  if (choice2El.dataset['data-choice'] == correctAns) {
-    playerRecord.rightAns++;
-  } else {
-    playerRecord.wrongAns++;
-    subtractTime(0,30);
-  }
+  // event.preventDefault();
+  callButton = "b";
+  stateOfTheUnion();
 };
+
+//  event onclick guess Button C
 function guessAnswerC(event) {
   console.log(">>> Entered guessAnswerC function <<<<");
-  event.preventDefault();
-
-  if (choice3El.dataset['data-choice'] == correctAns) {
-    playerRecord.rightAns++;
-  } else {
-    playerRecord.wrongAns++;
-    subtractTime(0,30);
-  }
+  // event.preventDefault();
+  callButton = "c";
+  stateOfTheUnion();
 };
+
+//  event onclick guess Button D
 function guessAnswerD(event) {
   console.log(">>> Entered guessAnswerD function <<<<");
-  event.preventDefault();
+  // event.preventDefault();
+  callButton = "d";
+  stateOfTheUnion();
+};
 
-  if (choice4El.dataset['data-choice'] == correctAns) {
-    playerRecord.rightAns++;
-  } else {
-    playerRecord.wrongAns++;
-    subtractTime(0,30);
+// Event onclick start button
+function startQuiz(event) {
+  console.log(">>> Entered startQuiz function <<<<");
+  // event.preventDefault();
+  callButton = "start";
+  stateOfTheUnion();
+};
+
+function stateOfTheUnion() {
+  console.log(">>> Entered stateOfTheUnion function <<<<");
+  switch (quizWiz) {
+    case -1:
+      console.log(">>> End quiz <<<<");
+      //  quiz is over
+      if (callButton === "start") {
+        console.log(">>> restart quiz <<<<");
+        quizWiz = 0;
+        clearHallOfFame();
+        displayHallOfFame();
+        stateOfTheUnion();
+      } else {
+        endQuiz();
+      }
+      break;
+    case 0:
+      console.log(">>> begin quiz <<<<");
+      // quiz has started
+      if (callButton !== "start") {
+        console.log(">>> What are you doing? You need to press start button.");
+      } else {
+        quizWiz = 1;
+        initQuiz();
+        runTimer(5,0);
+        AskQuestion();
+      }
+      break;
+    case 1:
+      console.log(">>> quiz in progress<<<<");
+      // quiz has started
+      if (callButton === "start") {
+        console.log(">>> What are you doing? The quiz is in progress. You can\'t restart now.");
+      } else {
+        // quizWiz = 1;
+        checkAnswer();
+        AskQuestion();
+      }
+      break;
+    default:
+      console.log(">>> What happened here?");
+      console.log("quizWiz ==>" + quizWiz);
+      console.log(" callButton ==>" + callButton)
+      break;
   }
-};
+}
 
-function programFlow(event) {
-  console.log(">>> Entered programFlow function <<<<");
-  event.preventDefault();
-    prompt("What are your initials?", playerRecord.player);
-  // start countdown for 5 min
-  countdown(5,0);
-  askQuestions();
-};
 
-// Populate Hall of Fame, init countdown and 
-programInit();
+    // Populate Hall of Fame on load and end of quiz
+// displayHallOfFame();
 // Attach event listener to start button element
-startButtonEl.addEventListener("click", programFlow);
-programClose();
+// startButtonEl.addEventListener("click", programFlow);
+// programClose();
 console.log(">>>>>>>>>>>>>>>>>>>  End of JavaScript  <<<<<<<<<<<<<<<<")
