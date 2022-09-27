@@ -58,7 +58,7 @@ choices: {
   c: "Nagahama Plaza",
   d: "Aon Center", 
 },
-correct: "c",
+correct: "a",
 },
 {question: "What flavor of Pop Tarts does Buddy the Elf use in his spaghetti in Elf?", 
 choices: { 
@@ -229,7 +229,7 @@ var hallOfFame= [{
   player: "AAA",
   rightAns: 0,
   wrongAns: 0,
-  timeLeft: "00:00",
+  timeLeft: "99:99",
 }];
 
 //  ...........current player information  
@@ -263,11 +263,10 @@ function initQuiz() {
   timerEl.textContent = "05:00";
 
   // prompt player initials
-  prompt("What are your initials?", playerRecord[0].player);
+  playerRecord[0].player = prompt("What are your initials?", "XXX");
   playerRecord[0].rightAns = 0;
   playerRecord[0].wrongAns = 0;
-  playerRecord[0].minsLeft = 0;
-  playerRecord[0].secsLeft = 0;
+  playerRecord[0].timeLeft = "99:99";
   // get a different set of questions at the start of each quiz
   randomQuestion = randomQuestions();
   console.log("quiz length ==>" + quiz.length);
@@ -279,6 +278,7 @@ function endQuiz() {
   console.log(">>> Entered endQuiz function <<<<");
   // update Hall Of Fame
   storeScore();
+  playerRecord[0].timeLeft = displayTime();
   questionAreaEl.innerHTML = "      Great Job, " + playerRecord[0].player + "!";
   choice1El.innerHTML= " You had " + playerRecord[0].rightAns + " right answers and " + playerRecord[0].wrongAns + " wrong.";
   choice2El.innerHTML= "          You had " + playerRecord[0].timeLeft + " time remaining.";
@@ -289,7 +289,7 @@ function endQuiz() {
 function storeScore() {
   console.log(">>> Entered storeScore function <<<");
   console.log(" Hall of Fame  ==>" + hallOfFame);
-  console.log(" playerRecord ==>" + playerRecord[0].player + '/' + playerRecord[0].rightAns + '/' + playerRecord[0].wrongAns + '/' + playerRecord[0].minsLeft + ':' + playerRecord[0].secsLeft);
+  console.log(" playerRecord ==>" + playerRecord[0].player + '/' + playerRecord[0].rightAns + '/' + playerRecord[0].wrongAns + '/' + playerRecord[0].timeLeft);
   
   if (hallOfFame.length < 5) {
     hallOfFame.push(playerRecord[0]);
@@ -340,7 +340,7 @@ function displayHallOfFame() {
       textHOF  = hallOfFame[i].player   + '-----' ;
       textHOF += hallOfFame[i].rightAns + '-----' ; 
       textHOF += hallOfFame[i].wrongAns + '-----' ;
-      textHOF += displayTime();
+      textHOF += hallOfFame[i].timeLeft;
       console.log("textHOF ===>> " + textHOF);
       liEl.textContent = textHOF;
       listHOFEl.appendChild(liEl);  // connect the list element to the "ul"
@@ -360,17 +360,18 @@ function runTimer() {
     // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
   var timerInterval = setInterval(function () {
     timeLeft--;
-    // As long as the `timeLeft` is greater than 1
-    if (timeLeft <= 0) {
-      // Once `timeLeft` gets to 0, set `timerEl` to an empty string
-      timerEl.textContent = '00:00';
+    // if end of questions, stop the timer
+    if (quizWiz === -1) { 
       // Use `clearInterval()` to stop the timer
       clearInterval(timerInterval);
-      // Call the `displayMessage()` function
-      // displayMessage();
+    } else if (timeLeft <= 0) {
+      console.log(">>> Out of Time message here <<<" );
+      console.log("time stopped because...callButton=>" + callButton + '< quizWiz==>' + quizWiz);
+      timerEl.textContent = "00:00";
+      // Use `clearInterval()` to stop the timer
+      clearInterval(timerInterval);
       callButton = "timeOut";       // set the call status
       quizWiz = -1;                 // set state to quiz over
-      console.log(">>> Out of Time message here <<<" );
       stateOfTheUnion();
     } else {
      // Set the `textContent` of `timerEl` to show the remaining seconds
@@ -431,15 +432,15 @@ function AskQuestion () {
 
 //  check the answer
 function checkAnswer() {
-  console.log(">>> Entered guessAnswerA function <<<<");
+  console.log(">>> Entered checkAnswer function <<<<");
   console.log(">>> call Button ==>>" + callButton);
   console.log(">>> correct answer ==>>" + correctAns);
   if (callButton == correctAns) {
-    console.log("..... Correct guess .....");
     playerRecord[0].rightAns++;
+    console.log("..... Correct guess ....." + playerRecord[0].rightAns);
   } else {
-    console.log("..... Wrong guess .....");
     playerRecord[0].wrongAns++;
+    console.log("..... Wrong guess ....." + playerRecord[0].wrongAns);
     subtractTime(0,30);
   }
 };
@@ -488,7 +489,9 @@ function stateOfTheUnion() {
   console.log(">>> Entered stateOfTheUnion function <<<<");
   switch (quizWiz) {
     case -1:
-      console.log(">>> End quiz <<<<");
+      console.log(">>> End quiz <<<<" );
+      console.log("quizWiz ==>" + quizWiz);
+      console.log("callButton==>" + callButton)
       //  quiz is over
       if (callButton === "start") {
         console.log(">>> restart quiz <<<<");
@@ -502,6 +505,8 @@ function stateOfTheUnion() {
       break;
     case 0:
       console.log(">>> begin quiz <<<<");
+      console.log("quizWiz ==>" + quizWiz);
+      console.log("callButton==>" + callButton)
       // quiz has started
       if (callButton !== "start") {
         console.log(">>> What are you doing? You need to press start button.");
@@ -514,6 +519,8 @@ function stateOfTheUnion() {
       break;
     case 1:
       console.log(">>> quiz in progress<<<<");
+      console.log("quizWiz ==>" + quizWiz);
+      console.log("callButton==>" + callButton)
       // quiz has started
       if (callButton === "start") {
         console.log(">>> What are you doing? The quiz is in progress. You can\'t restart now.");
