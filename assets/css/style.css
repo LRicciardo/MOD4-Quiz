@@ -10,6 +10,11 @@ body {
   font-family: "Roboto", sans-serif;
   background-color: #D0FAFA;
   color: #001b44;
+  color: var(--txt-dark);
+  background-image: url("../images/1391530-film-strip-wallpaper-1920x1080-720p.jpg");
+  background-size: cover;
+  background-position: center;
+  margin: 0 auto;
 }
  
 .heading1-container {

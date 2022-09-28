@@ -8,7 +8,7 @@
     <!-- <link rel="stylesheet" href="./assets/css/normalize.css" /> -->
     <link rel="stylesheet" href="./assets/css/style.css" />
   </head>
-  <body onload="displayHallOfFame()">
+  <body onload="buildHall()">
     <header>
       <h1>Movie Trivia for Dinosaurs</h1>
       <h2>or for Serious Movie Buffs</h2>
@@ -23,20 +23,36 @@
     <div class="main">
       <div class="quiz-container">
         <div class="question-container">
-          <span id ="questionArea">This is the question area xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx</span>
+          <span id ="questionArea"></span>
         </div>
         <div class="answerArea">
-          <button type="button" id="guess1" onclick="guessAnswerA()">A. <span id="choice1" data-choice="a">This is the choice 1 button xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx</span></button>
-          <button type="button" id="guess2" onclick="guessAnswerB()">B. <span id="choice2" data-choice="b">This is the choice 2 button xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx</span></button>
-          <button type="button" id="guess3" onclick="guessAnswerC()">C. <span id="choice3" data-choice="c">This is the choice 3 button xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx</span></button>
-          <button type="button" id="guess4" onclick="guessAnswerD()">D. <span id="choice4" data-choice="d">This is the choice 4 button xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx</span></button>
+          <button type="button" id="guess1" onclick="guessAnswerA()">A. <span id="choice1" data-choice="a"></span></button>
+          <button type="button" id="guess2" onclick="guessAnswerB()">B. <span id="choice2" data-choice="b"></span></button>
+          <button type="button" id="guess3" onclick="guessAnswerC()">C. <span id="choice3" data-choice="c"></span></button>
+          <button type="button" id="guess4" onclick="guessAnswerD()">D. <span id="choice4" data-choice="d"></span></button>
         </div>
       </div>
       <div class="holdingContainer">
         <div class="famousPeople">
           <h3 class="hallOfFame">Hall of Fame</h3>
-          <h6 class="hallOfFame">Player ----- Right ----- Wrong ----- Time Left</h6>
-          <ul id="listHOF">xxxxxxxxxx</ul>
+          <!-- <h6 class="hallOfFame">Player ----- Right ----- Wrong ----- Time Left</h6> -->
+          <!-- <ul id="listHOF">xxxxxxxxxx</ul> -->
+          <div id="displayHOF">
+            <table>
+                <tr>
+                    <th>player</th>
+                    <th>Right</th>
+                    <th>Wrong</th>
+                    <th>time left</th>            
+                </tr>
+                <tr>
+                    <td>XXX</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>00:00</td>            
+                </tr>
+            </table>
+          </div>
         </div>
       </div>
     </div>
